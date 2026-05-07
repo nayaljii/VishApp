@@ -53,6 +53,7 @@ html, body {
 
 .brand {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 12px;
     padding: 12px;
@@ -74,6 +75,35 @@ html, body {
 .brand p {
     font-size: 0.8rem;
     color: var(--muted);
+}
+
+.chatbot-float-btn {
+    display: none;
+}
+
+.chatbot-top-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3000;
+    box-shadow: 0 8px 25px rgba(16, 163, 127, 0.35);
+    transition: 0.25s ease;
+}
+
+.chatbot-top-btn:hover {
+    transform: scale(1.08);
+    background: var(--accent-hover);
+}
+
+.chatbot-top-btn i {
+    font-size: 30px;
 }
 
 .chat-list,
@@ -315,35 +345,6 @@ html, body {
 .registered-user small {
     color: var(--muted);
     font-size: 0.72rem;
-}
-
-/* ---------- FLOATING AI CHAT BUTTON ---------- */
-.chatbot-float-btn {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    width: 62px;
-    height: 62px;
-    border: none;
-    border-radius: 50%;
-    background: var(--accent);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 3000;
-    box-shadow: 0 8px 25px rgba(16, 163, 127, 0.35);
-    transition: 0.25s ease;
-}
-
-.chatbot-float-btn:hover {
-    transform: scale(1.08);
-    background: var(--accent-hover);
-}
-
-.chatbot-float-btn i {
-    font-size: 30px;
 }
 
 /* ---------- MESSAGES ---------- */
@@ -946,11 +947,36 @@ footer {
         width: 200px;
     }
 
+    .brand {
+        justify-content: start;
+        gap: 30px;
+    }
+
+    .chatbot-top-btn {
+        display: none;
+    }
+
     .chatbot-float-btn {
         width: 56px;
         height: 56px;
         right: 18px;
-        bottom: 18px;
+        bottom: 25px;
+        border: none;
+        border-radius: 50%;
+        background: var(--accent);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 3000;
+        box-shadow: 0 8px 25px rgba(16, 163, 127, 0.35);
+        transition: 0.25s ease;
+    }
+
+    .chatbot-float-btn:hover {
+        transform: scale(1.08);
+        background: var(--accent-hover);
     }
 
     .chatbot-float-btn i {
