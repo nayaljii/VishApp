@@ -1,4 +1,4 @@
-// Node server with Socket.io and SPA support
+// ================= IMPORTS =================
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
@@ -10,23 +10,22 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const OpenAI = require("openai");
 
-// Models
+// ================= MODELS =================
 const Message = require("./models/Message");
 const Chat = require("./models/Chat");
 const User = require("./models/User");
 const PrivateMessage = require("./models/PrivateMessage");
 
-// Routes
+// ================= ROUTES =================
 const authRoutes = require("./routes/auth");
 
-// MongoDB connection
+// ================= DATABASE CONNECTION =================
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log("Connected to MongoDB"))
 .catch((err) => console.log("MongoDB connection error:", err));
 
-// Middleware
+// ================= MIDDLEWARE =================
 app.use(express.json());
-
 app.use(cors({
     origin: [
         "http://localhost:3000",
@@ -35,9 +34,23 @@ app.use(cors({
     credentials: true
 }));
 
+// ================= STATIC FILES =================
 app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Vish'sUp-style chat list API
+// ================= AUTH ROUTES =================
+app.use("/api/auth", authRoutes);
+
+// ================= OPENROUTER CLIENT =================
+const client = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultHeaders: {
+        "HTTP-Referer": "https://vishsup-nayaljii.vercel.app",
+        "X-Title": "Vish AI Chatbot",
+    },
+});
+
+// ================= CHAT LIST API =================
 app.get("/chat-list/:username", async (req, res) => {
     try {
         const { username } = req.params;
@@ -87,20 +100,7 @@ app.get("/chat-list/:username", async (req, res) => {
     }
 });
 
-// Auth Routes
-app.use("/api/auth", authRoutes);
-
-// OpenRouter Client
-const client = new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENROUTER_API_KEY,
-    defaultHeaders: {
-        "HTTP-Referer": "https://vishsup-nayaljii.vercel.app",
-        "X-Title": "Vish AI Chatbot",
-    },
-});
-
-// Messages API
+// ================= GROUP MESSAGE APIs =================
 app.get('/messages', async (req, res) => {
     try {
         const messages = await Message.find().sort({ time: 1 });
@@ -111,7 +111,7 @@ app.get('/messages', async (req, res) => {
     }
 });
 
-// Delete message API
+// ================= Delete GROUP MESSAGE APIs =================
 app.delete('/message/:id', async (req, res) => {
     const messageId = req.params.id;
     if(!mongoose.Types.ObjectId.isValid(messageId)){
@@ -126,9 +126,7 @@ app.delete('/message/:id', async (req, res) => {
     }
 });
 
-// AI Chat APIs
-
-// User-wise AI history
+// ================= AI CHAT APIs =================
 app.get("/ai/history/:username", async (req, res) => {
     const { username } = req.params;
 
@@ -145,7 +143,6 @@ app.get("/ai/history/:username", async (req, res) => {
     }
 });
 
-// AI chat message save + reply
 app.post("/ai/chat", async (req, res) => {
     const { username, message } = req.body;
 
@@ -198,7 +195,6 @@ app.post("/ai/chat", async (req, res) => {
     }
 });
 
-// User wise Delete message API
 app.delete("/ai/history/:username", async (req, res) => {
     const { username } = req.params;
 
@@ -211,12 +207,7 @@ app.delete("/ai/history/:username", async (req, res) => {
     }
 });
 
-// Private Message Room ID
-function getPrivateRoom(user1, user2) {
-    return [user1, user2].sort().join("_");
-}
-
-// Private Message API
+// ================= PRIVATE CHAT APIs =================
 app.get("/private/messages/:user1/:user2", async (req, res) => {
     try {
         const { user1, user2 } = req.params;
@@ -231,16 +222,7 @@ app.get("/private/messages/:user1/:user2", async (req, res) => {
     }
 });
 
-function emitOnlineUsers() {
-    const usersList = Object.keys(onlineUsers).map(username => ({
-        name: username,
-        id: onlineUsers[username]
-    }));
-
-    io.emit('update-users', usersList);
-}
-
-// Socket.io
+// ================= SOCKET.IO SETUP =================
 const io = new Server(server, {
     cors: {
         origin: [
@@ -251,22 +233,30 @@ const io = new Server(server, {
   }
 });
 
-// Socket.io logic
-const onlineUsers = {};
-const disconnectTimers = {};
+// ================= SOCKET HELPERS =================
+function getPrivateRoom(user1, user2) {
+    return [user1, user2].sort().join("_");
+}
 
+function emitOnlineUsers() {
+    const usersList = Object.keys(onlineUsers).map(username => ({
+        name: username,
+        id: onlineUsers[username]
+    }));
+
+    io.emit('update-users', usersList);
+}
+
+// ================= SOCKET STATE =================
+const onlineUsers = {};
+
+// ================= SOCKET EVENTS =================
 io.on('connection', socket => {
     socket.on('new-user-joined', name => {
         socket.data.username = name;
         onlineUsers[name] = socket.id;
-        
-        // reconnect Timer delete
-        if(disconnectTimers[name]){
-            clearTimeout(disconnectTimers[name]);
-            delete disconnectTimers[name];
-        }
+
         emitOnlineUsers();
-        socket.broadcast.emit('user-joined', name);
     });
     
     socket.on('send', async (data) => {
@@ -321,7 +311,7 @@ io.on('connection', socket => {
         socket.to(roomId).emit("private-user-stop-typing", { sender });
     });
 
-    socket.on('disconnect', async (reason) => {
+    socket.on('disconnect', async () => {
         const name = socket.data.username;
         
         if(!name) return;
@@ -339,12 +329,6 @@ io.on('connection', socket => {
         }
         
         emitOnlineUsers();
-        
-        disconnectTimers[name] = setTimeout(() => {
-            if (!onlineUsers[name]) {
-                io.emit('left', name);
-            }
-        }, 3000);
     });
     
     socket.on("join-private-room", ({ sender, receiver }) => {
@@ -436,11 +420,11 @@ io.on('connection', socket => {
     });
 });
 
-// SPA fallback
+// ================= SPA FALLBACK =================
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
 
-// Server port
+// ================= SERVER =================
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
