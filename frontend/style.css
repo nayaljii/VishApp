@@ -89,11 +89,10 @@ html, body {
     height: 50px;
     border: none;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--panel-2);
     color: white;
     cursor: pointer;
     z-index: 3000;
-    box-shadow: 0 8px 25px rgba(16, 163, 127, 0.35);
     transition: 0.25s ease;
 }
 
@@ -967,11 +966,10 @@ footer {
         bottom: 25px;
         border: none;
         border-radius: 50%;
-        background: var(--accent);
+        background: var(--panel-2);
         color: white;
         cursor: pointer;
         z-index: 3000;
-        box-shadow: 0 8px 25px rgba(16, 163, 127, 0.35);
         transition: 0.25s ease;
     }
 

@@ -936,6 +936,7 @@ toggleRegisteredUsersBtn.addEventListener("click", () => {
 // Back Button
 document.getElementById("backToChatsBtn").addEventListener("click", () => {
     document.body.classList.remove("chat-open");
+    document.getElementById('chatBotBtn').style.display = "flex";
 });
 
 // Cancel Reply
