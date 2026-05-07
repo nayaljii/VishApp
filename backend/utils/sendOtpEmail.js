@@ -10,9 +10,9 @@ const transporter = nodemailer.createTransport({
 
 async function sendOtpEmail(to, otp) {
     const mailOptions = {
-        from: `"Vish'sUp" <${process.env.EMAIL_USER}>`,
+        from: `"VishApp" <${process.env.EMAIL_USER}>`,
         to: to,
-        subject: "Your OTP for Vish'sUp",
+        subject: "Your OTP for VishApp",
         html: `
             <div style="font-family: Arial, sans-serif; padding: 20px;">
                 <h2>Email Verification</h2>

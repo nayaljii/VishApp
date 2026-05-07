@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(cors({
     origin: [
         "http://localhost:3000",
-        "https://vishsup-nayaljii.vercel.app"
+        "https://VishApp-nayaljii.vercel.app"
     ],
     credentials: true
 }));
@@ -45,7 +45,7 @@ const client = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
     apiKey: process.env.OPENROUTER_API_KEY,
     defaultHeaders: {
-        "HTTP-Referer": "https://vishsup-nayaljii.vercel.app",
+        "HTTP-Referer": "https://VishApp-nayaljii.vercel.app",
         "X-Title": "Vish AI Chatbot",
     },
 });
@@ -167,7 +167,7 @@ app.post("/ai/chat", async (req, res) => {
             messages: [
                 {
                     role: "system",
-                    content: "You are Vish'sUp AI assistant. Reply in a clean, friendly, modern chat style. Keep answers readable, well-spaced, and not too long unless asked. Use short paragraphs and simple formatting where useful."
+                    content: "You are VishAI assistant. Reply in a clean, friendly, modern chat style. Keep answers readable, well-spaced, and not too long unless asked. Use short paragraphs and simple formatting where useful."
                 },
                 ...historyMessages,
                 { role: "user", content: message }
@@ -227,7 +227,7 @@ const io = new Server(server, {
     cors: {
         origin: [
             "http://localhost:3000",
-      "https://vishsup-nayaljii.vercel.app"
+      "https://VishApp-nayaljii.vercel.app"
     ],
     methods: ["GET", "POST"]
   }

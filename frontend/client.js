@@ -172,7 +172,7 @@ async function loadChatUsers() {
 
             userEl.innerHTML = `
                 <div style="display:flex; justify-content:space-between;">
-                    <b>${chat.type === "group" ? "Vish'sUp Group" : chat.username}</b>
+                    <b>${chat.type === "group" ? "VishApp Group" : chat.username}</b>
                     ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ""}
                 </div>
                 <small>${chat.lastMessage || "No messages yet"}</small>
@@ -1029,7 +1029,7 @@ function openGroupChat() {
     document.body.classList.add("chat-open");
     document.querySelector(".chat-layout").classList.add("chat-selected");
 
-    document.getElementById("chatTitle").innerText = "Vish'sUp";
+    document.getElementById("chatTitle").innerText = "VishApp";
     document.getElementById("chatStatus").innerText = "Group Chat";
 
     messageContainer.innerHTML = "";
