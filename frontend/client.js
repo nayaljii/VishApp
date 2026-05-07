@@ -15,7 +15,6 @@ const anim = document.getElementById("sendAnim");
 const emojiBtn = document.getElementById("emojiBtn");
 const pickerContainer = document.getElementById("emojiPickerContainer");
 const emojiPicker = document.getElementById("emojiPicker");
-const chatBot = document.getElementsByClassName("chatbot-float-btn");
 
 if(!name) {
     window.location.href = "/home.html";
@@ -990,7 +989,7 @@ async function openPrivateChat(user) {
         document.body.classList.remove("no-scroll");
     }
     
-    document.getElementsByClassName("chatbot-float-btn").style.display = "none";
+    document.getElementById('chatBotBtn').style.display = "none";
 
     document.body.classList.add("chat-open");
     document.querySelector(".chat-layout").classList.add("chat-selected");
@@ -1019,7 +1018,7 @@ function openGroupChat() {
     chatMode = "group";
     selectedUser = null;
 
-    document.getElementsByClassName("chatbot-float-btn").style.display = "none";
+    document.getElementById('chatBotBtn').style.display = "none";
 
     document.body.classList.add("chat-open");
     document.querySelector(".chat-layout").classList.add("chat-selected");
