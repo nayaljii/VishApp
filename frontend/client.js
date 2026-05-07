@@ -939,6 +939,11 @@ document.getElementById("backToChatsBtn").addEventListener("click", () => {
     document.getElementById('chatBotBtn').style.display = "flex";
 });
 
+// Back to Home
+document.getElementById("brandLogo").addEventListener("click", () => {
+    window.location.href = "/";
+});
+
 // Cancel Reply
 document.getElementById("cancelReply").addEventListener("click", () => {
     replyingTo = null;
