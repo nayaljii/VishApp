@@ -1110,7 +1110,6 @@ function openChatBot() {
 // ================= INIT =================
 
 window.addEventListener("DOMContentLoaded", () => {
-    loadMessages();
     loadRegisteredUsers();
     loadChatUsers();
 });

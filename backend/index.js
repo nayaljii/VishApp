@@ -25,12 +25,15 @@ mongoose.connect(process.env.MONGODB_URI)
 .catch((err) => console.log("MongoDB connection error:", err));
 
 // ================= MIDDLEWARE =================
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://vishsup-nayaljii.vercel.app",
+    "https://vishapp-nayaljii.vercel.app"
+];
+
 app.use(express.json());
 app.use(cors({
-    origin: [
-        "http://localhost:3000",
-        "https://VishApp-nayaljii.vercel.app"
-    ],
+    origin: allowedOrigins,
     credentials: true
 }));
 
@@ -225,11 +228,9 @@ app.get("/private/messages/:user1/:user2", async (req, res) => {
 // ================= SOCKET.IO SETUP =================
 const io = new Server(server, {
     cors: {
-        origin: [
-            "http://localhost:3000",
-      "https://VishApp-nayaljii.vercel.app"
-    ],
-    methods: ["GET", "POST"]
+        origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    cradentials: true
   }
 });
 

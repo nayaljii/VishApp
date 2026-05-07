@@ -5,7 +5,6 @@ const chatBox = document.getElementById("bot-chatBox");
 const username =
   localStorage.getItem("name") || localStorage.getItem("username");
 
-// apna deployed backend URL yahan rakho
 const API_BASE_URL = "https://groupchat-app-fut2.onrender.com";
 
 function goBack() {
