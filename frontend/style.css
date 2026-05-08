@@ -699,6 +699,7 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    width: fit-content;
     gap: 2px;
     opacity: 0;
     pointer-events: none;
@@ -813,13 +814,11 @@ html, body {
 }
 
 .message-wrapper.left .msg-actions {
-    align-self: flex-end;
-    margin-right: calc(100% - 70%);
+    margin-left: 12px;
 }
 
 .message-wrapper.right .msg-actions {
-    align-self: flex-start;
-    margin-left: calc(100% - 70%);
+    margin-right: 12px;
 }
 
 .reaction-display {

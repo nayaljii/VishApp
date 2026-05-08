@@ -445,6 +445,7 @@ const append = (data, position, id) => {
         messageElement.appendChild(nameDiv);
     }
 
+    messageElement.appendChild(textDiv);
     messageElement.appendChild(timeDiv);
     messageElement.setAttribute('data-id', id);
     
