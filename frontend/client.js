@@ -143,7 +143,7 @@ async function loadRegisteredUsers() {
                 <b>${user.username}</b>
                 <small>
                     ${user.username === name ? "You" : isOnline 
-                        ? "Online" : "Last seen " + formatLastLogin(user.lastLogin)}
+                        ? "Online" : formatLastSeen(user.lastSeen)}
                 </small>
             `;
 
@@ -1135,7 +1135,7 @@ function formatLastSeen(lastSeen) {
 
 // User LastLogin
 function formatLastLogin(lastLogin) {
-    if (!lastLogin) return "not available";
+    if (!lastLogin) return "a while ago";
 
     const diff = Date.now() - new Date(lastLogin).getTime();
     const minutes = Math.floor(diff / 60000);
