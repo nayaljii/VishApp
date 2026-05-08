@@ -1,9 +1,18 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
-    name: String,
-    message: String,
-    time: { type: Date, default: Date.now },
+    name: {
+        type: String,
+        required: true,
+    },
+    message: {
+        type: String,
+        required: true,
+    },
+    time: {
+        type: Date,
+        default: Date.now,
+    },
     replyTo: {
         id: String,
         sender: String,
@@ -13,6 +22,11 @@ const messageSchema = new mongoose.Schema({
         type: Map,
         of: [String],
         default: {}
+    },
+    status: {
+        type: String,
+        enum: ["sent", "delivered", "seen"],
+        default: "sent"
     }
 });
 

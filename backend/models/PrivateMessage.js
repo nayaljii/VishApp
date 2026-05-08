@@ -30,6 +30,11 @@ const privateMessageSchema = new mongoose.Schema({
         type: Map,
         of: [String],
         default: {}
+    },
+    status: {
+        type: String,
+        enum: ["sent", "delivered", "seen"],
+        default: "sent"
     }
 });
 

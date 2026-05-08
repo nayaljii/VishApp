@@ -586,6 +586,17 @@ html, body {
     transition: 0.2s;
 }
 
+.msg-tick {
+    margin-left: 4px;
+    font-size: 0.7rem;
+    color: #c4c4c4;
+}
+
+.blue-tick {
+    color: #4fc3f7;
+    font-weight: 700;
+}
+
 @media (hover: hover) and (pointer: fine) {
     .message-wrapper:hover .msg-actions {
         opacity: 1;

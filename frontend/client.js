@@ -100,7 +100,8 @@ async function loadPrivateMessages(sender, receiver) {
                     message: msg.message,
                     time: msg.time,
                     replyTo: msg.replyTo,
-                    reactions: msg.reactions
+                    reactions: msg.reactions,
+                    status: msg.status
                 }, "right", msg._id);
             } else {
                 append({
@@ -108,7 +109,8 @@ async function loadPrivateMessages(sender, receiver) {
                     message: msg.message,
                     time: msg.time,
                     replyTo: msg.replyTo,
-                    reactions: msg.reactions
+                    reactions: msg.reactions,
+                    status: msg.status
                 }, "left", msg._id);
             }
         });
@@ -199,6 +201,14 @@ async function loadChatUsers() {
     } catch (err) {
         console.error("Error loading chat users:", err);
     }
+}
+
+// Seen Ticks
+function getTicks(status) {
+    if (status === "sent") return "✓";
+    if (status === "delivered") return "✓✓";
+    if (status === "seen") return `<span class="blue-tick">✓✓</span>`;
+    return "";
 }
 
 // ================= MESSAGE UI =================
@@ -381,7 +391,12 @@ const append = (data, position, id) => {
     // For Time Div
     const timeDiv = document.createElement('div');
     timeDiv.classList.add('msg-time');
-    timeDiv.innerText = formatTime(data.time);
+
+    if (position === "right" && chatMode === "private") {
+        timeDiv.innerHTML = `${formatTime(data.time)} <span class="msg-tick">${getTicks(data.status)}</span>`;
+    } else {
+        timeDiv.innerText = formatTime(data.time);
+    }
     
     if (chatMode !== "private") {
         const nameDiv = document.createElement('div');
@@ -729,7 +744,8 @@ socket.on("receive-private-message", (data) => {
             message: data.message,
             time: data.time,
             replyTo: data.replyTo,
-            reactions: data.reactions
+            reactions: data.reactions,
+            status: data.status
         }, "right", data.id);
 
         // Play sound only for msg send has interacted with the page
@@ -742,7 +758,8 @@ socket.on("receive-private-message", (data) => {
             message: data.message,
             time: data.time,
             replyTo: data.replyTo,
-            reactions: data.reactions
+            reactions: data.reactions,
+            status: data.status
         }, "left", data.id);
 
         // Play sound only for incoming messages and if user has interacted with the page
@@ -806,6 +823,16 @@ socket.on("private-user-stop-typing", ({ sender }) => {
     if (sender !== selectedUser) return;
 
     typingIndicator.innerText = "";
+});
+
+// Seen Update
+socket.on("private-messages-seen-update", ({ sender, receiver }) => {
+    if (chatMode !== "private") return;
+    if (selectedUser !== receiver) return;
+
+    document.querySelectorAll(".message.right .msg-tick").forEach(tick => {
+        tick.innerHTML = `<span class="blue-tick">✓✓</span>`;
+    });
 });
 
 // ================= EVENT LISTENERS =================
@@ -1030,6 +1057,10 @@ async function openPrivateChat(user) {
     delete unreadCounts[user.username];
     loadChatUsers();
     await loadPrivateMessages(name, selectedUser);
+    socket.emit("private-messages-seen", {
+        sender: selectedUser,
+        receiver: name
+    });
 }
 
 // Open Group chat

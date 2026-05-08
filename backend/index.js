@@ -343,15 +343,18 @@ io.on('connection', socket => {
     socket.on("private-message", async ({ sender, receiver, message, replyTo }) => {
         try {
             const roomId = getPrivateRoom(sender, receiver);
-            
+
+            const isReceiverOnline = !!onlineUsers[receiver];
+
             const savedMsg = await PrivateMessage.create({
                 roomId,
                 sender,
                 receiver,
                 message,
-                replyTo: replyTo || null
+                replyTo: replyTo || null,
+                status: isReceiverOnline ? "delivered" : "sent"
             });
-            
+
             const msgData = {
                 id: savedMsg._id,
                 roomId,
@@ -360,12 +363,13 @@ io.on('connection', socket => {
                 message,
                 time: savedMsg.time,
                 replyTo: savedMsg.replyTo,
-                reactions: savedMsg.reactions
+                reactions: savedMsg.reactions,
+                status: savedMsg.status
             };
 
-            io.to(roomId).emit("receive-private-message", msgData);
+            io.to(sender).emit("receive-private-message", msgData);
             io.to(receiver).emit("receive-private-message", msgData);
-            
+
         } catch (err) {
             console.error("Private message error:", err);
         }
@@ -426,6 +430,32 @@ io.on('connection', socket => {
             console.error("Reaction error:", err);
         }
     });
+
+    socket.on("private-messages-seen", async ({ sender, receiver }) => {
+    try {
+        const roomId = getPrivateRoom(sender, receiver);
+
+        await PrivateMessage.updateMany(
+            {
+                roomId,
+                sender,
+                receiver,
+                status: { $ne: "seen" }
+            },
+            {
+                status: "seen"
+            }
+        );
+
+        io.to(sender).emit("private-messages-seen-update", {
+            sender,
+            receiver
+        });
+
+    } catch (err) {
+        console.error("Seen update error:", err);
+    }
+});
 });
 
 // ================= SPA FALLBACK =================
