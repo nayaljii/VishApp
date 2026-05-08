@@ -961,7 +961,7 @@ html, body {
     background: var(--panel);
     border-radius: 12px;
     padding: 10px;
-    min-width: 220px;
+    min-width: 150px;
     max-width: calc(100vw - 20px);
     z-index: 9999;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);

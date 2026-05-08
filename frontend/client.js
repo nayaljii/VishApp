@@ -377,10 +377,6 @@ const append = (data, position, id) => {
     }
 
     wrapper.appendChild(messageElement);
-
-    // Logic
-    wrapper.appendChild(messageElement);
-
     messageContainer.appendChild(wrapper);
 
     // For Name Div
@@ -449,8 +445,12 @@ const append = (data, position, id) => {
         messageElement.appendChild(nameDiv);
     }
 
-    messageElement.appendChild(textDiv);
     messageElement.appendChild(timeDiv);
+
+    if (position !== "system" && id) {
+        messageElement.appendChild(actions);
+    }
+
     messageElement.setAttribute('data-id', id);
     
     // Auto scroll to bottom of container
@@ -1079,6 +1079,7 @@ toggleRegisteredUsersBtn.addEventListener("click", () => {
 // Back Button
 document.getElementById("backToChatsBtn").addEventListener("click", () => {
     document.body.classList.remove("chat-open");
+    document.body.classList.remove("chat-open");
     document.getElementById('chatBotBtn').style.display = "flex";
 });
 
@@ -1217,6 +1218,7 @@ async function openPrivateChat(user) {
     document.getElementById('chatBotBtn').style.display = "none";
 
     document.body.classList.add("chat-open");
+    history.pushState({ chatOpen: true }, "", location.href);
     document.querySelector(".chat-layout").classList.add("chat-selected");
     
     const isOnline = currentOnlineUsers.includes(user.username);
@@ -1254,6 +1256,7 @@ function openGroupChat() {
     document.getElementById('chatBotBtn').style.display = "none";
 
     document.body.classList.add("chat-open");
+    history.pushState({ chatOpen: true }, "", location.href);
     document.querySelector(".chat-layout").classList.add("chat-selected");
 
     document.getElementById("chatTitle").innerText = "VishApp";
@@ -1398,6 +1401,19 @@ function logout(){
 function openChatBot() {
     window.location.href = "/chatbot.html";
 }
+
+// Mobile browser back button handling
+window.addEventListener("popstate", () => {
+
+    if (document.body.classList.contains("chat-open")) {
+
+        document.body.classList.remove("chat-open");
+
+        document.getElementById('chatBotBtn').style.display = "flex";
+
+        history.pushState(null, "", location.href);
+    }
+});
 
 // ================= INIT =================
 
