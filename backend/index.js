@@ -432,30 +432,57 @@ io.on('connection', socket => {
     });
 
     socket.on("private-messages-seen", async ({ sender, receiver }) => {
-    try {
-        const roomId = getPrivateRoom(sender, receiver);
+        try {
+            const roomId = getPrivateRoom(sender, receiver);
 
-        await PrivateMessage.updateMany(
-            {
-                roomId,
+            await PrivateMessage.updateMany(
+                {
+                    roomId,
+                    sender,
+                    receiver,
+                    status: { $ne: "seen" }
+                },
+                {
+                    status: "seen"
+                }
+            );
+
+            io.to(sender).emit("private-messages-seen-update", {
                 sender,
-                receiver,
-                status: { $ne: "seen" }
-            },
-            {
-                status: "seen"
-            }
-        );
+                receiver
+            });
 
-        io.to(sender).emit("private-messages-seen-update", {
-            sender,
-            receiver
-        });
+        } catch (err) {
+            console.error("Seen update error:", err);
+        }
+    });
 
-    } catch (err) {
-        console.error("Seen update error:", err);
-    }
-});
+    socket.on("mark-delivered", async ({ sender, receiver }) => {
+        try {
+
+            const roomId = getPrivateRoom(sender, receiver);
+
+            await PrivateMessage.updateMany(
+                {
+                    roomId,
+                    sender,
+                    receiver,
+                    status: "sent"
+                },
+                {
+                    status: "delivered"
+                }
+            );
+
+            io.to(sender).emit("messages-delivered-update", {
+                sender,
+                receiver
+            });
+
+        } catch (err) {
+            console.error("Delivered update error:", err);
+        }
+    });
 });
 
 // ================= SPA FALLBACK =================

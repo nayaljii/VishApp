@@ -233,32 +233,29 @@ async function loadChatUsers() {
     }
 }
 
-// Delete Count
-function decreaseUnreadByDeletedMessage(id) {
-    Object.keys(unreadCounts).forEach(key => {
-        const data = unreadCounts[key];
+// Load Unread Count
+async function loadUnreadCounts() {
+    try {
 
-        if (!data || !Array.isArray(data.ids)) return;
+        const res = await fetch(
+            `${BASE_URL}/api/auth/unread/${name}`
+        );
 
-        if (data.ids.includes(id)) {
-            data.ids = data.ids.filter(msgId => msgId !== id);
-            data.count = Math.max(0, data.count - 1);
+        const data = await res.json();
 
-            if (data.count === 0) {
-                delete unreadCounts[key];
-            }
-        }
-    });
+        Object.keys(data).forEach(user => {
 
-    loadChatUsers();
-}
+            unreadCounts[user] = {
+                count: data[user],
+                ids: []
+            };
+        });
 
-// Seen Ticks
-function getTicks(status) {
-    if (status === "sent") return "✓";
-    if (status === "delivered") return "✓✓";
-    if (status === "seen") return `<span class="blue-tick">✓✓</span>`;
-    return "";
+        loadChatUsers();
+
+    } catch (err) {
+        console.error("Unread load error:", err);
+    }
 }
 
 // ================= MESSAGE UI =================
@@ -379,14 +376,10 @@ const append = (data, position, id) => {
         }
     }
 
+    wrapper.appendChild(messageElement);
+
     // Logic
-    if (position === "right") {
-        wrapper.appendChild(actions);
-        wrapper.appendChild(messageElement);
-    } else {
-        wrapper.appendChild(messageElement);
-        wrapper.appendChild(actions);
-    }
+    wrapper.appendChild(messageElement);
 
     messageContainer.appendChild(wrapper);
 
@@ -688,8 +681,24 @@ function showReactionUsers(reactions, messageId, targetEl) {
 
     const rect = targetEl.getBoundingClientRect();
 
-    popup.style.top = `${rect.bottom + 8}px`;
-    popup.style.left = `${rect.left}px`;
+    const popupWidth = popup.offsetWidth;
+    const screenPadding = 10;
+
+    let top = rect.bottom + 8;
+    let left = rect.left;
+
+    // right side overflow
+    if (left + popupWidth > window.innerWidth - screenPadding) {
+        left = window.innerWidth - popupWidth - screenPadding;
+    }
+
+    // left side overflow
+    if (left < screenPadding) {
+        left = screenPadding;
+    }
+
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
     popup.style.transform = "none";
 
     setTimeout(() => {
@@ -895,6 +904,20 @@ socket.on("private-user-stop-typing", ({ sender }) => {
     if (sender !== selectedUser) return;
 
     typingIndicator.innerText = "";
+});
+
+// Deliverd Update
+socket.on("messages-delivered-update", ({ sender, receiver }) => {
+
+    if (selectedUser !== receiver) return;
+
+    document.querySelectorAll(".message.right .msg-tick")
+        .forEach(tick => {
+
+            if (!tick.innerHTML.includes("blue-tick")) {
+                tick.innerHTML = "✓✓";
+            }
+        });
 });
 
 // Seen Update
@@ -1213,6 +1236,10 @@ async function openPrivateChat(user) {
     delete unreadCounts[user.username];
     loadChatUsers();
     await loadPrivateMessages(name, selectedUser);
+    socket.emit("mark-delivered", {
+        sender: selectedUser,
+        receiver: name
+    });
     socket.emit("private-messages-seen", {
         sender: selectedUser,
         receiver: name
@@ -1313,6 +1340,34 @@ function refreshSelectedUserStatus() {
     }
 }
 
+// Delete Count
+function decreaseUnreadByDeletedMessage(id) {
+    Object.keys(unreadCounts).forEach(key => {
+        const data = unreadCounts[key];
+
+        if (!data || !Array.isArray(data.ids)) return;
+
+        if (data.ids.includes(id)) {
+            data.ids = data.ids.filter(msgId => msgId !== id);
+            data.count = Math.max(0, data.count - 1);
+
+            if (data.count === 0) {
+                delete unreadCounts[key];
+            }
+        }
+    });
+
+    loadChatUsers();
+}
+
+// Seen Ticks
+function getTicks(status) {
+    if (status === "sent") return "✓";
+    if (status === "delivered") return "✓✓";
+    if (status === "seen") return `<span class="blue-tick">✓✓</span>`;
+    return "";
+}
+
 // Play sound
 function playSound(audio){
     const sound = audio.cloneNode(); // Clone the audio element to allow overlapping sounds
@@ -1349,6 +1404,7 @@ function openChatBot() {
 window.addEventListener("DOMContentLoaded", () => {
     loadRegisteredUsers();
     loadChatUsers();
+    loadUnreadCounts();
 });
 window.addEventListener("load", () => {
     socket.emit('stop-typing');

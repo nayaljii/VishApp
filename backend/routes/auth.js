@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const PrivateMessage = require("../models/PrivateMessage");
 
 const { OAuth2Client } = require("google-auth-library");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -159,6 +160,36 @@ router.post("/change-password", async (req, res) => {
 
     } catch (err) {
         console.error("Change password error:", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+// Unread Count
+router.get("/unread/:username", async (req, res) => {
+    try {
+
+        const username = req.params.username;
+
+        const unreadMessages = await PrivateMessage.find({
+            receiver: username,
+            status: { $ne: "seen" }
+        });
+
+        const unreadCounts = {};
+
+        unreadMessages.forEach(msg => {
+
+            if (!unreadCounts[msg.sender]) {
+                unreadCounts[msg.sender] = 0;
+            }
+
+            unreadCounts[msg.sender]++;
+        });
+
+        res.json(unreadCounts);
+
+    } catch (err) {
+        console.error("Unread fetch error:", err);
         res.status(500).json({ msg: "Server error" });
     }
 });
