@@ -127,7 +127,12 @@ async function loadRegisteredUsers() {
         allUsers = users;
 
         registeredUsersDiv.innerHTML = "";
+        users.sort((a, b) => {
+            if (a.username === name) return -1;
+            if (b.username === name) return 1;
 
+            return new Date(b.lastLogin || 0) - new Date(a.lastLogin || 0);
+        });
         users.forEach(user => {
             const userEl = document.createElement("div");
             userEl.classList.add("registered-user");
@@ -136,7 +141,10 @@ async function loadRegisteredUsers() {
 
             userEl.innerHTML = `
                 <b>${user.username}</b>
-                <small>${isOnline ? "Online" : formatLastSeen(user.lastSeen)}</small>
+                <small>
+                    ${user.username === name ? "You" : isOnline 
+                        ? "Online" : "Last login " + formatLastLogin(user.lastLogin)}
+                </small>
             `;
 
             // Private Chat Console
@@ -1104,6 +1112,22 @@ function formatLastSeen(lastSeen) {
     if (hours < 24) return `Last seen ${hours} hr ago`;
 
     return `Last seen ${days} day ago`;
+}
+
+// User LastLogin
+function formatLastLogin(lastLogin) {
+    if (!lastLogin) return "not available";
+
+    const diff = Date.now() - new Date(lastLogin).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours} hr ago`;
+
+    return `${days} day ago`;
 }
 
 // Refresh Selected User Status

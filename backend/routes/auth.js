@@ -87,6 +87,7 @@ router.post("/verify-otp-register", async (req, res) => {
         email: normalizedEmail,
         password: hashedPassword,
         isVerified: true,
+        lastLogin: new Date()
     });
 
     await Otp.deleteMany({ email: normalizedEmail });
@@ -115,7 +116,7 @@ router.post("/verify-otp-register", async (req, res) => {
 // GET REGISTERED USERS
 router.get("/users", async (req, res) => {
     try {
-        const users = await User.find({}, "username email lastSeen").sort({ username: 1 });
+        const users = await User.find({}, "username email lastSeen lastLogin").sort({ lastLogin: -1, username: 1 });
         res.json(users);
     } catch (error) {
         console.error("Users fetch error:", error);
@@ -164,6 +165,9 @@ router.post("/google-login", async (req, res) => {
             await user.save();
         }
 
+        user.lastLogin = new Date();
+        await user.save();
+
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
@@ -196,6 +200,8 @@ router.post("/login", async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ msg: "Wrong password" });
+        user.lastLogin = new Date();
+        await user.save();
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
                 
