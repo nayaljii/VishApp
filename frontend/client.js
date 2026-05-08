@@ -3,6 +3,7 @@ const BASE_URL = "https://groupchat-app-fut2.onrender.com";
 const socket = io(BASE_URL);
 const token = localStorage.getItem("token");   
 const name = localStorage.getItem("username");
+const toggle = document.getElementById('menu-toggle');
 const messageContainer = document.querySelector('.container');
 const messageInput = document.getElementById('messageInp');
 const chatUsersDiv = document.getElementById("chat-users");
@@ -10,7 +11,6 @@ const registeredUsersDiv = document.getElementById("registered-users");
 const toggleRegisteredUsersBtn = document.getElementById("toggle-registered-users");
 const typingIndicator = document.getElementById('typing-indicator');
 const form = document.getElementById('send-container');
-const toggle = document.getElementById('menu-toggle');
 const anim = document.getElementById("sendAnim");
 const emojiBtn = document.getElementById("emojiBtn");
 const pickerContainer = document.getElementById("emojiPickerContainer");
@@ -143,7 +143,7 @@ async function loadRegisteredUsers() {
                 <b>${user.username}</b>
                 <small>
                     ${user.username === name ? "You" : isOnline 
-                        ? "Online" : "Last login " + formatLastLogin(user.lastLogin)}
+                        ? "Online" : "Last seen " + formatLastLogin(user.lastLogin)}
                 </small>
             `;
 
@@ -845,9 +845,18 @@ socket.on("private-messages-seen-update", ({ sender, receiver }) => {
 
 // ================= EVENT LISTENERS =================
 // Toggle menu
-if(toggle) {
-    toggle.addEventListener('change', () => {
+if (toggle) {
+    toggle.addEventListener("change", () => {
         document.body.classList.toggle("no-scroll", toggle.checked);
+
+        // menu close hote hi All Users list hide
+        if (!toggle.checked) {
+            registeredVisible = false;
+            registeredUsersDiv.style.display = "none";
+
+            const span = document.getElementById("sidebar-btn-span");
+            if (span) span.style.display = "none";
+        }
     });
 }
 
@@ -1041,6 +1050,11 @@ async function openPrivateChat(user) {
     if (menuToggle) {
         menuToggle.checked = false;
         document.body.classList.remove("no-scroll");
+        registeredVisible = false;
+        registeredUsersDiv.style.display = "none";
+
+        const span = document.getElementById("sidebar-btn-span");
+        if (span) span.style.display = "none";
     }
     
     document.getElementById('chatBotBtn').style.display = "none";
@@ -1095,6 +1109,11 @@ function openGroupChat() {
     if (menuToggle) {
         menuToggle.checked = false;
         document.body.classList.remove("no-scroll");
+        registeredVisible = false;
+        registeredUsersDiv.style.display = "none";
+
+        const span = document.getElementById("sidebar-btn-span");
+        if (span) span.style.display = "none";
     }
 }
 
