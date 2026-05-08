@@ -376,7 +376,15 @@ const append = (data, position, id) => {
         }
     }
 
-    wrapper.appendChild(messageElement);
+    // Logic
+    if (position === "right") {
+        wrapper.appendChild(actions);
+        wrapper.appendChild(messageElement);
+    } else {
+        wrapper.appendChild(messageElement);
+        wrapper.appendChild(actions);
+    }
+
     messageContainer.appendChild(wrapper);
 
     // For Name Div
@@ -486,10 +494,6 @@ const append = (data, position, id) => {
             }, 250);
         }
     });
-
-    if (position !== "system" && id) {
-        wrapper.appendChild(actions);
-    }
 
     renderReactions(messageElement, data.reactions);
 };
