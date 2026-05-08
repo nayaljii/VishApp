@@ -666,6 +666,11 @@ socket.on('update-users', (users) => {
 
 // Receive group message
 socket.on('receive', data => {
+    if (chatMode !== "group") {
+        unreadCounts["group"] = (unreadCounts["group"] || 0) + 1;
+        loadChatUsers();
+    }
+
     if (chatMode !== "group") return;
 
     if(data.name === name){
@@ -696,6 +701,8 @@ socket.on('receive', data => {
             playSound(audio1);
         }
     }
+
+    loadChatUsers();
 })
 
 // Receive private message
@@ -704,6 +711,7 @@ socket.on("receive-private-message", (data) => {
     if (data.sender !== name) {
         if (chatMode !== "private" || data.sender !== selectedUser) {
             unreadCounts[data.sender] = (unreadCounts[data.sender] || 0) + 1;
+            loadChatUsers();
         }
     }
 
@@ -1015,7 +1023,7 @@ async function openPrivateChat(user) {
         receiver: selectedUser
     });
 
-    unreadCounts[user.username] = 0;
+    delete unreadCounts[user.username];
     loadChatUsers();
     await loadPrivateMessages(name, selectedUser);
 }
@@ -1037,6 +1045,7 @@ function openGroupChat() {
     typingIndicator.innerText = "";
     lastDateKey = "";
 
+    delete unreadCounts["group"];
     loadMessages();
 
     const menuToggle = document.getElementById("menu-toggle");
