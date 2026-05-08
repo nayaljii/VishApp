@@ -213,4 +213,41 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// CHANGE PASSWORD
+router.post("/change-password", async (req, res) => {
+    try {
+        const { username, newPassword, confirmPassword } = req.body;
+
+        if (!username || !newPassword || !confirmPassword) {
+            return res.status(400).json({ msg: "All fields are required" });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ msg: "Passwords do not match" });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ msg: "Password must be at least 6 characters" });
+        }
+
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+        user.authProvider = "local";
+        await user.save();
+
+        res.json({ msg: "Password changed successfully" });
+
+    } catch (err) {
+        console.error("Change password error:", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
 module.exports = router;

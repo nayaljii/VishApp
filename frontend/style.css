@@ -237,8 +237,8 @@ html, body {
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background: var(--panel-2);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: none;
     color: var(--text);
     z-index: 2000;
     display: flex;
@@ -595,6 +595,76 @@ html, body {
 .blue-tick {
     color: #4fc3f7;
     font-weight: 700;
+}
+
+.password-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+}
+
+.password-box-modal {
+    width: min(360px, 100%);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    position: relative;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.password-box-modal h3 {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.password-box-modal label {
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.password-box-modal input {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    outline: none;
+    color: var(--text);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+#changePasswordBtn {
+    margin-top: 8px;
+    border: none;
+    border-radius: 999px;
+    padding: 12px;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#changePasswordBtn:hover {
+    background: var(--accent-hover);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 26px;
+    cursor: pointer;
 }
 
 @media (hover: hover) and (pointer: fine) {

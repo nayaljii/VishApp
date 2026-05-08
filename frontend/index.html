@@ -109,11 +109,27 @@
             <div id="registered-users">
                 <!-- Registered users will show here -->
             </div>
-
+            <button id="changePasswordMenuBtn" class="logout-btn" type="button">Password</button>
             <button id="logout" class="logout-btn" onclick="logout()">Logout</button>
         </div>
 
     </main>
+
+    <div id="changePasswordModal" class="password-modal">
+        <div class="password-box-modal">
+            <button id="closePasswordModal" class="modal-close-btn" type="button">×</button>
+
+            <h3>Change Password</h3>
+
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="Enter new password">
+
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm password">
+
+            <button id="changePasswordBtn" type="button">Change</button>
+        </div>
+    </div>
     <button id="chatBotBtn" class="chatbot-float-btn" onclick="openChatBot()">
         <i class="ph ph-robot"></i>
     </button>
