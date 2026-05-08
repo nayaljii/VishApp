@@ -925,6 +925,7 @@ toggleRegisteredUsersBtn.addEventListener("click", () => {
     registeredVisible = !registeredVisible;
 
     if (registeredVisible) {
+        document.getElementById("sidebar-btn-span").style.display = "flex"
         registeredUsersDiv.style.display = "flex";
         registeredUsersDiv.style.flexDirection = "column";
         loadRegisteredUsers();

@@ -304,6 +304,8 @@ html, body {
 
 .sidebar-btn,
 .logout-btn {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     border: 1px solid var(--border);
     background: var(--panel-2);
@@ -314,9 +316,14 @@ html, body {
     font-weight: 700;
 }
 
+.sidebar-btn span {
+    display: none;
+    font-size: 0.5rem;
+}
+
 .logout-btn:hover {
     background: rgba(239, 68, 68, 0.12);
-    color: #ffd6d6;
+    color: var(--text);
 }
 
 #registered-users {
@@ -327,6 +334,18 @@ html, body {
     background: var(--panel-2);
     border-radius: 12px;
     padding: 8px;
+    scroll-behavior: smooth;
+}
+
+#registered-users::-webkit-scrollbar {
+    width: 8px;
+}
+#registered-users::-webkit-scrollbar-thumb {
+    background: #4b4b4b;
+    border-radius: 50px;
+}
+#registered-users::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .registered-user {
