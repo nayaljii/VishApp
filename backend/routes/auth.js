@@ -116,7 +116,8 @@ router.post("/verify-otp-register", async (req, res) => {
 // GET REGISTERED USERS
 router.get("/users", async (req, res) => {
     try {
-        const users = await User.find({}, "username email lastSeen lastLogin").sort({ lastLogin: -1, username: 1 });
+        const users = await User.find({}, "username email lastSeen lastLogin")
+            .sort({ lastLogin: -1, username: 1 });
         res.json(users);
     } catch (error) {
         console.error("Users fetch error:", error);

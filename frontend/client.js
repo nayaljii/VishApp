@@ -128,10 +128,22 @@ async function loadRegisteredUsers() {
 
         registeredUsersDiv.innerHTML = "";
         users.sort((a, b) => {
+            
             if (a.username === name) return -1;
             if (b.username === name) return 1;
 
-            return new Date(b.lastLogin || 0) - new Date(a.lastLogin || 0);
+            const aOnline = currentOnlineUsers.includes(a.username);
+            const bOnline = currentOnlineUsers.includes(b.username);
+
+            // online users first
+            if (aOnline && !bOnline) return -1;
+            if (!aOnline && bOnline) return 1;
+
+            // latest login users top
+            const aTime = new Date(a.lastLogin || a.lastSeen || 0).getTime();
+            const bTime = new Date(b.lastLogin || b.lastSeen || 0).getTime();
+
+            return bTime - aTime;
         });
         users.forEach(user => {
             const userEl = document.createElement("div");
