@@ -517,11 +517,11 @@ html, body {
 }
 
 .message-wrapper.right {
-    align-items: flex-end;
+    justify-content: flex-end;
 }
 
 .message-wrapper.left {
-    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .message {
@@ -698,6 +698,7 @@ html, body {
 .msg-actions {
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
     align-items: center;
     width: fit-content;
     gap: 2px;
