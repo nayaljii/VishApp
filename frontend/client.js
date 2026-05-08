@@ -168,7 +168,9 @@ async function loadChatUsers() {
             const userEl = document.createElement("div");
             userEl.classList.add("chat-user");
 
-            const unread = unreadCounts[chat.username] || 0;
+            const unread = chat.type === "group"
+                ? (unreadCounts["group"] || 0)
+                : (unreadCounts[chat.username] || 0);
 
             userEl.innerHTML = `
                 <div style="display:flex; justify-content:space-between;">
@@ -708,15 +710,18 @@ socket.on('receive', data => {
 // Receive private message
 socket.on("receive-private-message", (data) => {
 
-    if (data.sender !== name) {
-        if (chatMode !== "private" || data.sender !== selectedUser) {
-            unreadCounts[data.sender] = (unreadCounts[data.sender] || 0) + 1;
-            loadChatUsers();
-        }
+    const otherUser = data.sender === name ? data.receiver : data.sender;
+
+    const isCurrentPrivateChat =
+        chatMode === "private" && selectedUser === otherUser;
+
+    if (!isCurrentPrivateChat && data.sender !== name) {
+        unreadCounts[otherUser] = (unreadCounts[otherUser] || 0) + 1;
     }
 
-    if (chatMode !== "private") return;
-    if (data.sender !== selectedUser && data.sender !== name) return;
+    loadChatUsers();
+
+    if (!isCurrentPrivateChat) return;
 
     if (data.sender === name) {
         append({
@@ -745,7 +750,6 @@ socket.on("receive-private-message", (data) => {
             playSound(audio1);
         }
     }
-    loadChatUsers();
 });
 
 // Group message delete

@@ -257,6 +257,9 @@ io.on('connection', socket => {
         socket.data.username = name;
         onlineUsers[name] = socket.id;
 
+        // user personal room
+        socket.join(name);
+
         emitOnlineUsers();
     });
     
@@ -349,15 +352,19 @@ io.on('connection', socket => {
                 replyTo: replyTo || null
             });
             
-            io.to(roomId).emit("receive-private-message", {
+            const msgData = {
                 id: savedMsg._id,
                 roomId,
                 sender,
                 receiver,
                 message,
                 time: savedMsg.time,
-                replyTo: savedMsg.replyTo
-            });
+                replyTo: savedMsg.replyTo,
+                reactions: savedMsg.reactions
+            };
+
+            io.to(roomId).emit("receive-private-message", msgData);
+            io.to(receiver).emit("receive-private-message", msgData);
             
         } catch (err) {
             console.error("Private message error:", err);
