@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const { OAuth2Client } = require("google-auth-library");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -150,7 +151,7 @@ router.post("/change-password", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        user.password = hashedPassword;
+        user.password = await bcrypt.hash(newPassword, 10);
         user.authProvider = "local";
         await user.save();
 

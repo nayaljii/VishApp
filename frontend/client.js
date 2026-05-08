@@ -869,7 +869,6 @@ if (toggle) {
     toggle.addEventListener("change", () => {
         document.body.classList.toggle("no-scroll", toggle.checked);
 
-        // menu close hote hi All Users list hide
         if (!toggle.checked) {
             registeredVisible = false;
             registeredUsersDiv.style.display = "none";
@@ -1054,6 +1053,11 @@ changePasswordMenuBtn.addEventListener("click", () => {
     if (toggle) {
         toggle.checked = false;
         document.body.classList.remove("no-scroll");
+        registeredVisible = false;
+        registeredUsersDiv.style.display = "none";
+
+        const span = document.getElementById("sidebar-btn-span");
+        if (span) span.style.display = "none";
     }
 });
 
@@ -1259,7 +1263,10 @@ function refreshSelectedUserStatus() {
         : formatLastSeen(selectedUserData?.lastSeen);
 
     document.getElementById("chatStatus").innerText = statusText;
-    document.getElementById("mobileChatStatus").innerText = statusText;
+    const mobileStatus = document.getElementById("mobileChatStatus");
+    if (mobileStatus) {
+        mobileStatus.innerText = statusText;
+    }
 }
 
 // Play sound
