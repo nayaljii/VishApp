@@ -1,35 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Real-time chat application"> 
+    <meta name="description" content="Real-time chat application">
     <link rel="shortcut icon" href="Upload/chatapp_favicon.ico" type="image/x-icon">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="style.css">
     <title>VishApp</title>
 </head>
 <body>
-    <main>
-    <form id="homeForm">
-        <fieldset>
-            <legend>Welcome to VishApp</legend>
-            <p id="welcome">Real-time Chat Application</p>
-            <div class="btnDiv">
-                <button type="button" onclick="goLogin()" class="btn">Login</button>
-                <button type="button" onclick="goRegister()" class="btn">Register</button>
+    <main class="auth-page">
+        <section class="auth-card">
+            <div class="auth-logo">
+                <img src="Upload/chatapp_favicon.ico" alt="VishApp Logo">
             </div>
-        </fieldset>
-        <p id="back">New here? Click Register above 👆</p>
-    </form>
+
+            <h1>Welcome to VishApp</h1>
+            <p class="auth-subtitle">Login or register instantly with Google</p>
+
+            <div id="g_id_onload"
+                data-client_id="753074870781-vono8bdo7a3obht3d6tpigg2aj6uaus3.apps.googleusercontent.com"
+                data-callback="handleGoogleLogin">
+            </div>
+
+            <div class="google-btn-wrap">
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-size="large"
+                    data-theme="outline"
+                    data-text="continue_with"
+                    data-shape="pill"
+                    data-logo_alignment="left">
+                </div>
+            </div>
+
+            <hr>
+            
+            <div class="divider">
+                <span>or manually login</span>
+            </div>
+
+            <form id="manualLoginForm" class="manual-login-form">
+                <input type="email" id="loginEmail" placeholder="Enter email" required>
+
+                <div class="auth-password-box">
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    <button type="button" id="toggleLoginPassword">👁️</button>
+                </div>
+
+                <button type="submit" class="manual-login-btn">Login</button>
+            </form>
+
+            <p class="auth-note">
+                New user? Continue with Google first, then set password from Change Password.
+            </p>
+        </section>
     </main>
+
     <script>
-        function goLogin(){
-            window.location.href = "/login.html";
+        const BASE_URL = "https://groupchat-app-fut2.onrender.com";
+
+        // Google Register/Login
+        async function handleGoogleLogin(response) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/auth/google-login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        credential: response.credential
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("username", data.user.username);
+                    window.location.href = "/index.html";
+                } else {
+                    alert(data.msg || "Google login failed");
+                }
+
+            } catch (err) {
+                console.error("Google login error:", err);
+                alert("Server error. Please try again.");
+            }
         }
-        function goRegister(){
-            window.location.href = "/register.html";
-        }
+
+        // Manual Login
+        const manualLoginForm = document.getElementById("manualLoginForm");
+        const loginPassword = document.getElementById("loginPassword");
+        const toggleLoginPassword = document.getElementById("toggleLoginPassword");
+
+        toggleLoginPassword.addEventListener("click", () => {
+            if (loginPassword.type === "password") {
+                loginPassword.type = "text";
+                toggleLoginPassword.innerText = "🙈";
+            } else {
+                loginPassword.type = "password";
+                toggleLoginPassword.innerText = "👁️";
+            }
+        });
+
+        manualLoginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = loginPassword.value.trim();
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/auth/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("username", data.user.username);
+                    window.location.href = "/index.html";
+                } else {
+                    alert(data.msg || "Login failed");
+                }
+
+            } catch (err) {
+                console.error("Manual login error:", err);
+                alert("Server error");
+            }
+        });
     </script>
 </body>
 </html>
