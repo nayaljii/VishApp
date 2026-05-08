@@ -12,9 +12,17 @@ const toggleRegisteredUsersBtn = document.getElementById("toggle-registered-user
 const typingIndicator = document.getElementById('typing-indicator');
 const form = document.getElementById('send-container');
 const anim = document.getElementById("sendAnim");
+
 const emojiBtn = document.getElementById("emojiBtn");
 const pickerContainer = document.getElementById("emojiPickerContainer");
 const emojiPicker = document.getElementById("emojiPicker");
+
+const changePasswordMenuBtn = document.getElementById("changePasswordMenuBtn");
+const changePasswordModal = document.getElementById("changePasswordModal");
+const closePasswordModal = document.getElementById("closePasswordModal");
+const changePasswordBtn = document.getElementById("changePasswordBtn");
+const newPasswordInput = document.getElementById("newPassword");
+const confirmPasswordInput = document.getElementById("confirmPassword");
 
 if(!name) {
     window.location.href = "/home.html";
@@ -1039,6 +1047,72 @@ document.addEventListener("pointerdown", (e) => {
     }
 });
 
+// // Change Password Button
+changePasswordMenuBtn.addEventListener("click", () => {
+    openPasswordModal();
+
+    if (toggle) {
+        toggle.checked = false;
+        document.body.classList.remove("no-scroll");
+    }
+});
+
+closePasswordModal.addEventListener("click", closePasswordPopup);
+
+// // Change Password Model
+changePasswordModal.addEventListener("click", (e) => {
+    if (e.target === changePasswordModal) {
+        closePasswordPopup();
+    }
+});
+
+// Change Password
+changePasswordBtn.addEventListener("click", async () => {
+    const newPassword = newPasswordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    if (!newPassword || !confirmPassword) {
+        alert("Please fill both password fields");
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        alert("Passwords do not match");
+        return;
+    }
+
+    try {
+        changePasswordBtn.innerText = "Changing...";
+
+        const res = await fetch(`${BASE_URL}/api/auth/change-password`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: name,
+                newPassword,
+                confirmPassword
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.msg);
+            closePasswordPopup();
+        } else {
+            alert(data.msg || "Failed to change password");
+        }
+
+    } catch (err) {
+        console.error("Change password error:", err);
+        alert("Server error");
+    }
+
+    changePasswordBtn.innerText = "Change";
+});
+
 // ================= AUTH =================
 // get user details
 async function getUserDetails(username) {
@@ -1159,6 +1233,18 @@ function formatLastLogin(lastLogin) {
     if (hours < 24) return `${hours} hr ago`;
 
     return `${days} day ago`;
+}
+
+// Open Change Password
+function openPasswordModal() {
+    changePasswordModal.style.display = "flex";
+    newPasswordInput.value = "";
+    confirmPasswordInput.value = "";
+}
+
+// Close Change Password
+function closePasswordPopup() {
+    changePasswordModal.style.display = "none";
 }
 
 // Refresh Selected User Status
