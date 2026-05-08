@@ -510,18 +510,18 @@ html, body {
 
 .message-wrapper {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    gap: 2px;
     margin: 6px 0;
     width: 100%;
 }
 
 .message-wrapper.right {
-    justify-content: flex-end;
+    align-items: flex-end;
 }
 
 .message-wrapper.left {
-    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 .message {
@@ -699,11 +699,11 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 2px;
     opacity: 0;
     pointer-events: none;
     transition: 0.2s;
+    padding: 0 5px;
 }
 
 .msg-tick {
@@ -812,12 +812,14 @@ html, body {
     border-radius: 999px;
 }
 
-.message.left .msg-actions {
-    justify-content: flex-end;
+.message-wrapper.left .msg-actions {
+    align-self: flex-end;
+    margin-right: calc(100% - 70%);
 }
 
-.message.right .msg-actions {
-    justify-content: flex-start;
+.message-wrapper.right .msg-actions {
+    align-self: flex-start;
+    margin-left: calc(100% - 70%);
 }
 
 .reaction-display {

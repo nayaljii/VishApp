@@ -446,11 +446,6 @@ const append = (data, position, id) => {
     }
 
     messageElement.appendChild(timeDiv);
-
-    if (position !== "system" && id) {
-        messageElement.appendChild(actions);
-    }
-
     messageElement.setAttribute('data-id', id);
     
     // Auto scroll to bottom of container
@@ -490,6 +485,10 @@ const append = (data, position, id) => {
             }, 250);
         }
     });
+
+    if (position !== "system" && id) {
+        wrapper.appendChild(actions);
+    }
 
     renderReactions(messageElement, data.reactions);
 };
