@@ -198,14 +198,16 @@ async function loadChatUsers() {
             const userEl = document.createElement("div");
             userEl.classList.add("chat-user");
 
-            const unread = chat.type === "group"
-                ? (unreadCounts["group"] || 0)
-                : (unreadCounts[chat.username] || 0);
+            const unreadData = chat.type === "group"
+                ? unreadCounts["group"]
+                : unreadCounts[chat.username];
+
+            const unread = unreadData?.count || 0;
 
             userEl.innerHTML = `
                 <div style="display:flex; justify-content:space-between;">
                     <b>${chat.type === "group" ? "VishApp Group" : chat.username}</b>
-                    ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ""}
+                    ${Number(unread) > 0 ? `<span class="unread-badge">${unread}</span>` : ""}
                 </div>
                 <small>${chat.lastMessage || "No messages yet"}</small>
             `;
@@ -229,6 +231,26 @@ async function loadChatUsers() {
     } catch (err) {
         console.error("Error loading chat users:", err);
     }
+}
+
+// Delete Count
+function decreaseUnreadByDeletedMessage(id) {
+    Object.keys(unreadCounts).forEach(key => {
+        const data = unreadCounts[key];
+
+        if (!data || !Array.isArray(data.ids)) return;
+
+        if (data.ids.includes(id)) {
+            data.ids = data.ids.filter(msgId => msgId !== id);
+            data.count = Math.max(0, data.count - 1);
+
+            if (data.count === 0) {
+                delete unreadCounts[key];
+            }
+        }
+    });
+
+    loadChatUsers();
 }
 
 // Seen Ticks
@@ -609,7 +631,7 @@ function renderReactions(messageElement, reactions = {}) {
 
             span.onclick = (e) => {
                 e.stopPropagation();
-                showReactionUsers(reactions, messageElement.dataset.id);
+                showReactionUsers(reactions, messageElement.dataset.id, e.currentTarget);
             };
 
             reactionDiv.appendChild(span);
@@ -622,7 +644,7 @@ function renderReactions(messageElement, reactions = {}) {
 }
 
 // Show who reacted user
-function showReactionUsers(reactions, messageId) {
+function showReactionUsers(reactions, messageId, targetEl) {
     const old = document.querySelector(".reaction-users-popup");
     if (old) old.remove();
 
@@ -649,24 +671,26 @@ function showReactionUsers(reactions, messageId) {
 
                     socket.emit("react-message", {
                         id: messageId,
-                        emoji: emoji,
+                        emoji,
                         username: name,
-                        chatMode: chatMode
+                        chatMode
                     });
 
                     popup.remove();
                 };
             }
+
             popup.appendChild(row);
         });
     });
 
     document.body.appendChild(popup);
 
-    // center popup
-    popup.style.top = "50%";
-    popup.style.left = "50%";
-    popup.style.transform = "translate(-50%, -50%)";
+    const rect = targetEl.getBoundingClientRect();
+
+    popup.style.top = `${rect.bottom + 8}px`;
+    popup.style.left = `${rect.left}px`;
+    popup.style.transform = "none";
 
     setTimeout(() => {
         document.addEventListener("click", closeReactionUsers);
@@ -712,11 +736,19 @@ socket.on('update-users', (users) => {
 // Receive group message
 socket.on('receive', data => {
     if (chatMode !== "group") {
-        unreadCounts["group"] = (unreadCounts["group"] || 0) + 1;
-        loadChatUsers();
-    }
+        if (!unreadCounts["group"]) {
+            unreadCounts["group"] = {
+                count: 0,
+                ids: []
+            };
+        }
 
-    if (chatMode !== "group") return;
+        unreadCounts["group"].count++;
+        unreadCounts["group"].ids.push(data.id);
+
+        loadChatUsers();
+        return;
+    }
 
     if(data.name === name){
         append({
@@ -759,12 +791,21 @@ socket.on("receive-private-message", (data) => {
         chatMode === "private" && selectedUser === otherUser;
 
     if (!isCurrentPrivateChat && data.sender !== name) {
-        unreadCounts[otherUser] = (unreadCounts[otherUser] || 0) + 1;
+        if (!unreadCounts[otherUser]) {
+            unreadCounts[otherUser] = {
+                count: 0,
+                ids: []
+            };
+        }
+
+        unreadCounts[otherUser].count++;
+        unreadCounts[otherUser].ids.push(data.id);
+
+        loadChatUsers();
+        return;
     }
 
     loadChatUsers();
-
-    if (!isCurrentPrivateChat) return;
 
     if (data.sender === name) {
         append({
@@ -803,6 +844,8 @@ socket.on('message-deleted', id => {
     if(msg){
         msg.closest(".message-wrapper")?.remove();
     }
+
+    decreaseUnreadByDeletedMessage(id);
 });
 
 // Private message delete
@@ -811,7 +854,8 @@ socket.on("private-message-deleted", id => {
     if (msg) {
         msg.closest(".message-wrapper")?.remove();
     }
-    loadChatUsers();
+
+    decreaseUnreadByDeletedMessage(id);
 });
 
 // Reaction Update

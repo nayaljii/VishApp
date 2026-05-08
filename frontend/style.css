@@ -806,16 +806,17 @@ html, body {
     background: transparent;
     color: var(--text);
     cursor: pointer;
-    width: 26px;
-    height: 22px;
+    width: 28px;
+    height: 24px;
+    border-radius: 999px;
 }
 
-.message-wrapper.right .msg-actions {
-    order: -1;
+.message.left .msg-actions {
+    justify-content: flex-end;
 }
 
-.message-wrapper.left .msg-actions {
-    order: 1;
+.message.right .msg-actions {
+    justify-content: flex-start;
 }
 
 .reaction-display {
