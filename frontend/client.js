@@ -246,7 +246,7 @@ async function loadUnreadCounts() {
         Object.keys(data).forEach(user => {
 
             unreadCounts[user] = {
-                count: data[user],
+                count: Number(data[user]) || 0,
                 ids: []
             };
         });
@@ -859,6 +859,7 @@ socket.on('message-deleted', id => {
     }
 
     decreaseUnreadByDeletedMessage(id);
+    loadUnreadCounts();
 });
 
 // Private message delete
@@ -869,6 +870,7 @@ socket.on("private-message-deleted", id => {
     }
 
     decreaseUnreadByDeletedMessage(id);
+    loadUnreadCounts();
 });
 
 // Reaction Update
@@ -913,7 +915,9 @@ socket.on("private-user-stop-typing", ({ sender }) => {
 // Deliverd Update
 socket.on("messages-delivered-update", ({ sender, receiver }) => {
 
-    if (selectedUser !== receiver) return;
+    if (chatMode !== "private") return;
+
+    if (selectedUser !== sender) return;
 
     document.querySelectorAll(".message.right .msg-tick")
         .forEach(tick => {
