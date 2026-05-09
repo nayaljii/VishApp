@@ -822,22 +822,23 @@ html, body {
 }
 
 .reaction-display {
-    position: absolute;
-    bottom: -14px;
+    position: static;
     display: flex;
+    width: fit-content;
     gap: 2px;
     background: var(--panel-2);
     border-radius: 999px;
     padding: 1px 5px;
+    margin-top: 2px;
     z-index: 3;
 }
 
 .right .reaction-display {
-    right: 10px;
+    align-self: flex-end;
 }
 
 .left .reaction-display {
-    left: 10px;
+    align-self: flex-start;
 }
 
 .reaction-display:empty {

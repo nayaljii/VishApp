@@ -622,7 +622,7 @@ function renderReactions(messageElement, reactions = {}) {
     Object.entries(reactions).forEach(([emoji, users]) => {
         if (users.length > 0) {
             const span = document.createElement("span");
-            span.innerText = `${emoji} ${users.length}`;
+            span.innerText = `${emoji}`;
             if (users.includes(name)) {
                 span.classList.add("my-reaction");
             }
