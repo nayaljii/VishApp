@@ -235,6 +235,7 @@ async function loadChatUsers() {
 
 // Load Unread Count
 async function loadUnreadCounts() {
+    unreadCounts = {};
     try {
 
         const res = await fetch(
