@@ -236,6 +236,18 @@ html, body {
     box-shadow: none;
     padding: 0;
     max-height: none;
+    scroll-behavior: smooth;
+}
+
+#chat-users::-webkit-scrollbar {
+    width: 8px;
+}
+#chat-users::-webkit-scrollbar-thumb {
+    background: #4b4b4b;
+    border-radius: 50px;
+}
+#chat-users::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .chat-user {
